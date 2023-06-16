@@ -47,7 +47,11 @@ def get_pep_keys(soup, pep_keys):
     for tag in pep_type_key_tags:
         key = find_tag(tag, 'strong').text
         value = find_tag(tag, 'em').text
-        pep_keys[key] = value
+        pep_values = pep_keys.pop(key, None)
+        if pep_values is None:
+            pep_keys[key] = (value,)
+        else:
+            pep_keys[key] = pep_values + (value,)
 
 
 def check_status(pep, pep_statuses):
@@ -56,10 +60,11 @@ def check_status(pep, pep_statuses):
         if not status:
             status = '<No letter>'
         declared_status = pep_statuses.get(status)
-        if declared_status[0] != pep.real_status[0]:
+        if declared_status[0][0] != pep.real_status[0]:
+            status_text = ', '.join(declared_status)
             logging.info(f'Несовпадающие статусы:{pep.link}')
             logging.info(f'Статус в карточке: {pep.real_status}')
-            logging.info(f'Ожидаемый статус: {declared_status}')
+            logging.info(f'Ожидаемый статус: {status_text}')
     except KeyError:
         err_msg = (
             f'Возникла ошибка при сравнении статусов pep{pep.number}'
@@ -89,8 +94,9 @@ def get_peps(soup, peps, session):
             info.append(link)
             info.append(real_status)
             pep = Pep(*info)
-            check_status(pep, pep_statuses)
             peps[int(pep.number)] = pep
+    for item in peps.values():
+        check_status(item, pep_statuses)
 
 
 def cook_some_soup(session, url):
