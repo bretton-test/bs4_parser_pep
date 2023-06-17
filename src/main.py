@@ -1,15 +1,8 @@
-"""
-эх. так и знал, что рыбу надо рефакторить было.
-удивительный спринт. Прямо всё разжевывают и в рот кладут.
-Может следующий будет посложнее.
-"""
 import logging
 import re
-
 from urllib.parse import urljoin
 
 import requests_cache
-
 from tqdm import tqdm
 
 from configs import configure_argument_parser, configure_logging
@@ -52,10 +45,10 @@ def latest_versions(session):
         if 'All versions' in ul.text:
             a_tags = ul.find_all('a')
             break
-        else:
-            msg = f'Ничего не нашлось по адресу {MAIN_DOC_URL}'
-            logging.error(msg)
-            raise NoContentException(msg)
+    else:
+        msg = f'Ничего не нашлось по адресу {MAIN_DOC_URL}'
+        logging.error(msg)
+        raise NoContentException(msg)
     results = [('Ссылка на документацию', 'Версия', 'Статус')]
     pattern = r'Python (?P<version>\d\.\d+) \((?P<status>.*)\)'
     for a_tag in a_tags:
