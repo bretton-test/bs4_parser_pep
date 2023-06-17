@@ -5,3 +5,6 @@ BASE_DIR = Path(__file__).parent
 DATETIME_FORMAT = '%Y-%m-%d_%H-%M-%S'
 PEP_DOC_URL = 'https://peps.python.org/'
 EXPECTED_STATUS = {}  # только для тестов. Статусы получаю on line
+LOG_FORMAT = '"%(asctime)s - [%(levelname)s] - %(message)s"'
+DT_FORMAT = '%d.%m.%Y %H:%M:%S'
+OUTPUT_CHOICES = ('pretty', 'file')

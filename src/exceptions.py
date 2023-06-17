@@ -4,3 +4,7 @@ class ParserFindTagException(Exception):
 
 class CompareTagException(Exception):
     pass
+
+
+class NoContentException(Exception):
+    pass

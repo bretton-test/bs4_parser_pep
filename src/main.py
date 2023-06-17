@@ -1,12 +1,20 @@
+"""
+эх. так и знал, что рыбу надо рефакторить было.
+удивительный спринт. Прямо всё разжевывают и в рот кладут.
+Может следующий будет посложнее.
+"""
 import logging
 import re
+
 from urllib.parse import urljoin
 
 import requests_cache
+
 from tqdm import tqdm
 
 from configs import configure_argument_parser, configure_logging
 from constants import BASE_DIR, MAIN_DOC_URL, PEP_DOC_URL
+from exceptions import NoContentException
 from outputs import control_output
 from utils import cook_some_soup, find_tag, get_peps
 
@@ -45,15 +53,15 @@ def latest_versions(session):
             a_tags = ul.find_all('a')
             break
         else:
-            raise Exception('Ничего не нашлось')
+            msg = f'Ничего не нашлось по адресу {MAIN_DOC_URL}'
+            logging.error(msg)
+            raise NoContentException(msg)
     results = [('Ссылка на документацию', 'Версия', 'Статус')]
     pattern = r'Python (?P<version>\d\.\d+) \((?P<status>.*)\)'
     for a_tag in a_tags:
         text_match = re.search(pattern, a_tag.text)
-        if text_match is not None:
-            results.append((a_tag['href'], *text_match.groups()))
-        else:
-            results.append((a_tag['href'], a_tag.text, ''))
+        version = text_match.groups() if text_match else (a_tag.text, '')
+        results.append((a_tag['href'], *version))
     return results
 
 
